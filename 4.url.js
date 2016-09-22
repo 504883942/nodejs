@@ -1,19 +1,34 @@
 var controllers=require('./3.file.js');
-var express = require('express');
-var app = express();
+var http = require('http');
+var url = require('url');
 
-for(var i in controllers.controller ){
-	for(var j in controllers.controller[i])
-	{
+http.createServer(function(req, res){
+	var keys=["controller","action"];
+	var pathname = url.parse(req.url).pathname;  //pathname => select    
+	var para=pathname.substr(1).split('/');
+	console.log(para);
+	var route={};
+	for(var i in keys){
+		console.log(i);
+		route[keys[i]]=para[i];
+	} 
+	console.log(route);
+ 
+	
+ 
+    var arg =url.parse(req.url, true).query ;    
+	console.log(arg);
+	console.log(controllers.controller);
+	
+	
+	var content=controllers.controller[route["controller"]][route["action"]](arg);
+	console.log(content);
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+	res.write("result= "+content);
+    res.write("/"+route["controller"]+"/"+route["action"]);
+	res.end();
+	
+	
+}).listen(8081);
 
-		app.get("/"+i+"/"+j,controllers.controller[i][j])
-	}
-}
-var server = app.listen(8081, function () {
-
-  var host = server.address().address
-  var port = server.address().port
-
-  console.log("start http://%s:%s", host, port)
-
-})
+ 
